@@ -1,0 +1,941 @@
+-- Script Path: game:GetService("ReplicatedStorage").GameAnalytics
+-- Took 0s to decompile.
+-- Executor: Delta (1.1.736.1408)
+
+if game:GetService("RunService"):IsServer() then
+    return require(script.GameAnalytics)
+else
+    return require(script.GameAnalyticsClient)
+end
+-- Script Path: game:GetService("ReplicatedStorage").GameAnalytics.GameAnalytics
+-- Took 0.04s to decompile.
+-- Executor: Delta (1.1.736.1408)
+
+local v_u_1 = {
+    ["EGAResourceFlowType"] = require(script.GAResourceFlowType),
+    ["EGAProgressionStatus"] = require(script.GAProgressionStatus),
+    ["EGAErrorSeverity"] = require(script.GAErrorSeverity)
+}
+require(script.Types)
+local v_u_2 = require(script.Logger)
+local v_u_3 = require(script.Threading)
+local v_u_4 = require(script.State)
+local v_u_5 = require(script.Validation)
+local v_u_6 = require(script.Store)
+local v_u_7 = require(script.Events)
+local v_u_8 = require(script.Utilities)
+local v_u_9 = game:GetService("Players")
+local v_u_10 = game:GetService("MarketplaceService")
+local v_u_11 = game:GetService("RunService")
+local v_u_12 = game:GetService("ReplicatedStorage")
+local v_u_13 = game:GetService("LocalizationService")
+local v14 = game:GetService("ScriptContext")
+local v_u_15 = require(script.Postie)
+local v_u_16 = nil
+local v_u_17 = {}
+local v_u_18 = {}
+local v_u_19 = {}
+local v_u_20 = {}
+local v_u_21 = {}
+local v_u_22 = {}
+local function v_u_25(p23, ...) -- name: addToInitializationQueue
+    -- upvalues: (ref) v_u_21, (copy) v_u_2
+    if v_u_21 == nil then
+        v_u_2:w("Initialization queue already cleared.")
+    else
+        local v24 = v_u_21
+        table.insert(v24, {
+            ["Func"] = p23,
+            ["Args"] = { ... }
+        })
+        v_u_2:i("Added event to initialization queue")
+    end
+end
+local function v_u_29(p26, p27, ...) -- name: addToInitializationQueueByUserId
+    -- upvalues: (copy) v_u_1, (copy) v_u_22, (copy) v_u_2
+    if v_u_1:isPlayerReady(p26) then
+        v_u_2:w("Player initialization queue already cleared.")
+    else
+        if v_u_22[p26] == nil then
+            v_u_22[p26] = {}
+        end
+        local v28 = v_u_22[p26]
+        table.insert(v28, {
+            ["Func"] = p27,
+            ["Args"] = { ... }
+        })
+        v_u_2:i("Added event to player initialization queue")
+    end
+end
+local function v_u_35(p30) -- name: isSdkReady
+    -- upvalues: (copy) v_u_4, (copy) v_u_2
+    local v31 = p30.playerId or nil
+    local v32 = p30.needsInitialized or true
+    local v33 = p30.shouldWarn or false
+    local v34 = p30.message or ""
+    if v32 and not v_u_4.Initialized then
+        if v33 then
+            v_u_2:w(v34 .. " SDK is not initialized")
+        end
+        return false
+    end
+    if v32 and (v31 and not v_u_4:isEnabled(v31)) then
+        if v33 then
+            v_u_2:w(v34 .. " SDK is disabled")
+        end
+        return false
+    end
+    if not v32 or (not v31 or v_u_4:sessionIsStarted(v31)) then
+        return true
+    end
+    if v33 then
+        v_u_2:w(v34 .. " Session has not started yet")
+    end
+    return false
+end
+function v_u_1.configureAvailableCustomDimensions01(_, p36) -- name: configureAvailableCustomDimensions01
+    -- upvalues: (copy) v_u_35, (copy) v_u_2, (copy) v_u_4
+    if v_u_35({
+        ["needsInitialized"] = true,
+        ["shouldWarn"] = false
+    }) then
+        v_u_2:w("Available custom dimensions must be set before SDK is initialized")
+    else
+        v_u_4:setAvailableCustomDimensions01(p36)
+    end
+end
+function v_u_1.configureAvailableCustomDimensions02(_, p37) -- name: configureAvailableCustomDimensions02
+    -- upvalues: (copy) v_u_35, (copy) v_u_2, (copy) v_u_4
+    if v_u_35({
+        ["needsInitialized"] = true,
+        ["shouldWarn"] = false
+    }) then
+        v_u_2:w("Available custom dimensions must be set before SDK is initialized")
+    else
+        v_u_4:setAvailableCustomDimensions02(p37)
+    end
+end
+function v_u_1.configureAvailableCustomDimensions03(_, p38) -- name: configureAvailableCustomDimensions03
+    -- upvalues: (copy) v_u_35, (copy) v_u_2, (copy) v_u_4
+    if v_u_35({
+        ["needsInitialized"] = true,
+        ["shouldWarn"] = false
+    }) then
+        v_u_2:w("Available custom dimensions must be set before SDK is initialized")
+    else
+        v_u_4:setAvailableCustomDimensions03(p38)
+    end
+end
+function v_u_1.configureAvailableResourceCurrencies(_, p39) -- name: configureAvailableResourceCurrencies
+    -- upvalues: (copy) v_u_35, (copy) v_u_2, (copy) v_u_7
+    if v_u_35({
+        ["needsInitialized"] = true,
+        ["shouldWarn"] = false
+    }) then
+        v_u_2:w("Available resource currencies must be set before SDK is initialized")
+    else
+        v_u_7:setAvailableResourceCurrencies(p39)
+    end
+end
+function v_u_1.configureAvailableResourceItemTypes(_, p40) -- name: configureAvailableResourceItemTypes
+    -- upvalues: (copy) v_u_35, (copy) v_u_2, (copy) v_u_7
+    if v_u_35({
+        ["needsInitialized"] = true,
+        ["shouldWarn"] = false
+    }) then
+        v_u_2:w("Available resource item types must be set before SDK is initialized")
+    else
+        v_u_7:setAvailableResourceItemTypes(p40)
+    end
+end
+function v_u_1.configureBuild(_, p41) -- name: configureBuild
+    -- upvalues: (copy) v_u_35, (copy) v_u_2, (copy) v_u_7
+    if v_u_35({
+        ["needsInitialized"] = true,
+        ["shouldWarn"] = false
+    }) then
+        v_u_2:w("Build version must be set before SDK is initialized.")
+    else
+        v_u_7:setBuild(p41)
+    end
+end
+function v_u_1.configureAvailableGamepasses(_, p42) -- name: configureAvailableGamepasses
+    -- upvalues: (copy) v_u_35, (copy) v_u_2, (copy) v_u_4
+    if v_u_35({
+        ["needsInitialized"] = true,
+        ["shouldWarn"] = false
+    }) then
+        v_u_2:w("Available gamepasses must be set before SDK is initialized.")
+    else
+        v_u_4:setAvailableGamepasses(p42)
+    end
+end
+function v_u_1.startNewSession(_, p_u_43, p_u_44) -- name: startNewSession
+    -- upvalues: (copy) v_u_3, (copy) v_u_4, (copy) v_u_2
+    v_u_3:performTaskOnGAThread(function()
+        -- upvalues: (ref) v_u_4, (ref) v_u_2, (copy) p_u_43, (copy) p_u_44
+        if v_u_4:isEventSubmissionEnabled() then
+            if v_u_4.Initialized then
+                v_u_4:startNewSession(p_u_43, p_u_44)
+            else
+                v_u_2:w("Cannot start new session. SDK is not initialized yet.")
+            end
+        else
+            return
+        end
+    end)
+end
+function v_u_1.endSession(_, p_u_45) -- name: endSession
+    -- upvalues: (copy) v_u_3, (copy) v_u_4
+    v_u_3:performTaskOnGAThread(function()
+        -- upvalues: (ref) v_u_4, (copy) p_u_45
+        if v_u_4:isEventSubmissionEnabled() then
+            v_u_4:endSession(p_u_45)
+        end
+    end)
+end
+function v_u_1.filterForBusinessEvent(_, p46) -- name: filterForBusinessEvent
+    return string.gsub(p46, "[^A-Za-z0-9%s%-_%.%(%)!%?]", "")
+end
+function v_u_1.addBusinessEvent(_, p_u_47, p_u_48) -- name: addBusinessEvent
+    -- upvalues: (copy) v_u_3, (copy) v_u_4, (copy) v_u_35, (copy) v_u_29, (copy) v_u_1, (copy) v_u_25, (copy) v_u_7, (copy) v_u_9, (copy) v_u_6
+    v_u_3:performTaskOnGAThread(function()
+        -- upvalues: (ref) v_u_4, (ref) v_u_35, (copy) p_u_47, (ref) v_u_29, (ref) v_u_1, (copy) p_u_48, (ref) v_u_25, (ref) v_u_7, (ref) v_u_9, (ref) v_u_6
+        if v_u_4:isEventSubmissionEnabled() then
+            if v_u_35({
+                ["playerId"] = nil,
+                ["needsInitialized"] = true,
+                ["shouldWarn"] = false,
+                ["message"] = "Could not add business event",
+                ["playerId"] = p_u_47
+            }) then
+                if p_u_48 then
+                    local v49 = p_u_48.amount or 0
+                    local v50 = p_u_48.itemType or ""
+                    local v51 = p_u_48.itemId or ""
+                    local v52 = p_u_48.cartType or ""
+                    local v53 = v49 * 0.7 * 0.35
+                    local v54 = math.floor(v53)
+                    local v55 = p_u_48.gamepassId or nil
+                    v_u_7:addBusinessEvent(p_u_47, "USD", v54, v50, v51, v52, p_u_48.customFields)
+                    if v50 == "Gamepass" and v52 ~= "Website" then
+                        local v56 = v_u_9:GetPlayerByUserId(p_u_47)
+                        local v57 = v_u_6:GetPlayerDataFromCache(p_u_47)
+                        if not v57.OwnedGamepasses then
+                            v57.OwnedGamepasses = {}
+                        end
+                        local v58 = v57.OwnedGamepasses
+                        table.insert(v58, v55)
+                        v_u_6.PlayerCache[p_u_47] = v57
+                        v_u_6:SavePlayerData(v56)
+                    end
+                end
+            elseif p_u_47 then
+                v_u_29(p_u_47, v_u_1.addBusinessEvent, v_u_1, p_u_47, p_u_48)
+            else
+                v_u_25(v_u_1.addBusinessEvent, v_u_1, p_u_47, p_u_48)
+            end
+        else
+            return
+        end
+    end)
+end
+function v_u_1.addResourceEvent(_, p_u_59, p_u_60) -- name: addResourceEvent
+    -- upvalues: (copy) v_u_3, (copy) v_u_4, (copy) v_u_35, (copy) v_u_29, (copy) v_u_1, (copy) v_u_25, (copy) v_u_7
+    v_u_3:performTaskOnGAThread(function()
+        -- upvalues: (ref) v_u_4, (ref) v_u_35, (copy) p_u_59, (ref) v_u_29, (ref) v_u_1, (copy) p_u_60, (ref) v_u_25, (ref) v_u_7
+        if v_u_4:isEventSubmissionEnabled() then
+            if v_u_35({
+                ["playerId"] = nil,
+                ["needsInitialized"] = true,
+                ["shouldWarn"] = false,
+                ["message"] = "Could not add resource event",
+                ["playerId"] = p_u_59
+            }) then
+                if p_u_60 then
+                    v_u_7:addResourceEvent(p_u_59, p_u_60.flowType or 0, p_u_60.currency or "", p_u_60.amount or 0, p_u_60.itemType or "", p_u_60.itemId or "", p_u_60.customFields)
+                end
+            elseif p_u_59 then
+                v_u_29(p_u_59, v_u_1.addResourceEvent, v_u_1, p_u_59, p_u_60)
+            else
+                v_u_25(v_u_1.addResourceEvent, v_u_1, p_u_59, p_u_60)
+            end
+        else
+            return
+        end
+    end)
+end
+function v_u_1.addProgressionEvent(_, p_u_61, p_u_62) -- name: addProgressionEvent
+    -- upvalues: (copy) v_u_3, (copy) v_u_4, (copy) v_u_35, (copy) v_u_29, (copy) v_u_1, (copy) v_u_25, (copy) v_u_7
+    v_u_3:performTaskOnGAThread(function()
+        -- upvalues: (ref) v_u_4, (ref) v_u_35, (copy) p_u_61, (ref) v_u_29, (ref) v_u_1, (copy) p_u_62, (ref) v_u_25, (ref) v_u_7
+        if v_u_4:isEventSubmissionEnabled() then
+            if v_u_35({
+                ["playerId"] = nil,
+                ["needsInitialized"] = true,
+                ["shouldWarn"] = false,
+                ["message"] = "Could not add progression event",
+                ["playerId"] = p_u_61
+            }) then
+                if p_u_62 then
+                    v_u_7:addProgressionEvent(p_u_61, p_u_62.progressionStatus or 0, p_u_62.progression01 or "", p_u_62.progression02 or nil, p_u_62.progression03 or nil, p_u_62.score or nil, p_u_62.customFields)
+                end
+            elseif p_u_61 then
+                v_u_29(p_u_61, v_u_1.addProgressionEvent, v_u_1, p_u_61, p_u_62)
+            else
+                v_u_25(v_u_1.addProgressionEvent, v_u_1, p_u_61, p_u_62)
+            end
+        else
+            return
+        end
+    end)
+end
+function v_u_1.addDesignEvent(_, p_u_63, p_u_64) -- name: addDesignEvent
+    -- upvalues: (copy) v_u_3, (copy) v_u_4, (copy) v_u_35, (copy) v_u_29, (copy) v_u_1, (copy) v_u_25, (copy) v_u_7
+    v_u_3:performTaskOnGAThread(function()
+        -- upvalues: (ref) v_u_4, (ref) v_u_35, (copy) p_u_63, (ref) v_u_29, (ref) v_u_1, (copy) p_u_64, (ref) v_u_25, (ref) v_u_7
+        if v_u_4:isEventSubmissionEnabled() then
+            if v_u_35({
+                ["playerId"] = nil,
+                ["needsInitialized"] = true,
+                ["shouldWarn"] = false,
+                ["message"] = "Could not add design event",
+                ["playerId"] = p_u_63
+            }) then
+                if p_u_64 then
+                    v_u_7:addDesignEvent(p_u_63, p_u_64.eventId or "", p_u_64.value or nil, p_u_64.customFields)
+                end
+            elseif p_u_63 then
+                v_u_29(p_u_63, v_u_1.addDesignEvent, v_u_1, p_u_63, p_u_64)
+            else
+                v_u_25(v_u_1.addDesignEvent, v_u_1, p_u_63, p_u_64)
+            end
+        else
+            return
+        end
+    end)
+end
+function v_u_1.addErrorEvent(_, p_u_65, p_u_66) -- name: addErrorEvent
+    -- upvalues: (copy) v_u_3, (copy) v_u_4, (copy) v_u_35, (copy) v_u_29, (copy) v_u_1, (copy) v_u_25, (copy) v_u_7
+    v_u_3:performTaskOnGAThread(function()
+        -- upvalues: (ref) v_u_4, (ref) v_u_35, (copy) p_u_65, (ref) v_u_29, (ref) v_u_1, (copy) p_u_66, (ref) v_u_25, (ref) v_u_7
+        if v_u_4:isEventSubmissionEnabled() then
+            if v_u_35({
+                ["playerId"] = nil,
+                ["needsInitialized"] = true,
+                ["shouldWarn"] = false,
+                ["message"] = "Could not add error event",
+                ["playerId"] = p_u_65
+            }) then
+                if p_u_66 then
+                    v_u_7:addErrorEvent(p_u_65, p_u_66.severity or 0, p_u_66.message or "", p_u_66.customFields)
+                end
+            elseif p_u_65 then
+                v_u_29(p_u_65, v_u_1.addErrorEvent, v_u_1, p_u_65, p_u_66)
+            else
+                v_u_25(v_u_1.addErrorEvent, v_u_1, p_u_65, p_u_66)
+            end
+        else
+            return
+        end
+    end)
+end
+function v_u_1.setEnabledDebugLog(_, p67) -- name: setEnabledDebugLog
+    -- upvalues: (copy) v_u_11, (copy) v_u_2
+    if v_u_11:IsStudio() then
+        if p67 then
+            v_u_2:setDebugLog(p67)
+            v_u_2:i("Debug logging enabled")
+        else
+            v_u_2:i("Debug logging disabled")
+            v_u_2:setDebugLog(p67)
+        end
+    else
+        v_u_2:i("setEnabledDebugLog can only be used in studio")
+        return
+    end
+end
+function v_u_1.setEnabledInfoLog(_, p68) -- name: setEnabledInfoLog
+    -- upvalues: (copy) v_u_2
+    if p68 then
+        v_u_2:setInfoLog(p68)
+        v_u_2:i("Info logging enabled")
+    else
+        v_u_2:i("Info logging disabled")
+        v_u_2:setInfoLog(p68)
+    end
+end
+function v_u_1.setEnabledVerboseLog(_, p69) -- name: setEnabledVerboseLog
+    -- upvalues: (copy) v_u_2
+    if p69 then
+        v_u_2:setVerboseLog(p69)
+        v_u_2:ii("Verbose logging enabled")
+    else
+        v_u_2:ii("Verbose logging disabled")
+        v_u_2:setVerboseLog(p69)
+    end
+end
+function v_u_1.setEnabledEventSubmission(_, p_u_70) -- name: setEnabledEventSubmission
+    -- upvalues: (copy) v_u_3, (copy) v_u_4, (copy) v_u_2
+    v_u_3:performTaskOnGAThread(function()
+        -- upvalues: (copy) p_u_70, (ref) v_u_4, (ref) v_u_2
+        if p_u_70 then
+            v_u_4:setEventSubmission(p_u_70)
+            v_u_2:i("Event submission enabled")
+        else
+            v_u_2:i("Event submission disabled")
+            v_u_4:setEventSubmission(p_u_70)
+        end
+    end)
+end
+function v_u_1.setCustomDimension01(_, p_u_71, p_u_72) -- name: setCustomDimension01
+    -- upvalues: (copy) v_u_3, (copy) v_u_5, (copy) v_u_4, (copy) v_u_2, (copy) v_u_35
+    v_u_3:performTaskOnGAThread(function()
+        -- upvalues: (ref) v_u_5, (ref) v_u_4, (copy) p_u_72, (ref) v_u_2, (ref) v_u_35, (copy) p_u_71
+        if v_u_5:validateDimension(v_u_4._availableCustomDimensions01, p_u_72) then
+            if v_u_35({
+                ["playerId"] = nil,
+                ["needsInitialized"] = true,
+                ["shouldWarn"] = true,
+                ["message"] = "Could not set custom01 dimension",
+                ["playerId"] = p_u_71
+            }) then
+                v_u_4:setCustomDimension01(p_u_71, p_u_72)
+            end
+        else
+            v_u_2:w("Could not set custom01 dimension value to \'" .. (p_u_72 or "") .. "\'. Value not found in available custom01 dimension values")
+            return
+        end
+    end)
+end
+function v_u_1.setCustomDimension02(_, p_u_73, p_u_74) -- name: setCustomDimension02
+    -- upvalues: (copy) v_u_3, (copy) v_u_5, (copy) v_u_4, (copy) v_u_2, (copy) v_u_35
+    v_u_3:performTaskOnGAThread(function()
+        -- upvalues: (ref) v_u_5, (ref) v_u_4, (copy) p_u_74, (ref) v_u_2, (ref) v_u_35, (copy) p_u_73
+        if v_u_5:validateDimension(v_u_4._availableCustomDimensions02, p_u_74) then
+            if v_u_35({
+                ["playerId"] = nil,
+                ["needsInitialized"] = true,
+                ["shouldWarn"] = true,
+                ["message"] = "Could not set custom02 dimension",
+                ["playerId"] = p_u_73
+            }) then
+                v_u_4:setCustomDimension02(p_u_73, p_u_74)
+            end
+        else
+            v_u_2:w("Could not set custom02 dimension value to \'" .. (p_u_74 or "") .. "\'. Value not found in available custom02 dimension values")
+            return
+        end
+    end)
+end
+function v_u_1.setCustomDimension03(_, p_u_75, p_u_76) -- name: setCustomDimension03
+    -- upvalues: (copy) v_u_3, (copy) v_u_5, (copy) v_u_4, (copy) v_u_2, (copy) v_u_35
+    v_u_3:performTaskOnGAThread(function()
+        -- upvalues: (ref) v_u_5, (ref) v_u_4, (copy) p_u_76, (ref) v_u_2, (ref) v_u_35, (copy) p_u_75
+        if v_u_5:validateDimension(v_u_4._availableCustomDimensions03, p_u_76) then
+            if v_u_35({
+                ["playerId"] = nil,
+                ["needsInitialized"] = true,
+                ["shouldWarn"] = true,
+                ["message"] = "Could not set custom03 dimension",
+                ["playerId"] = p_u_75
+            }) then
+                v_u_4:setCustomDimension03(p_u_75, p_u_76)
+            end
+        else
+            v_u_2:w("Could not set custom03 dimension value to \'" .. (p_u_76 or "") .. "\'. Value not found in available custom03 dimension values")
+            return
+        end
+    end)
+end
+function v_u_1.setEnabledReportErrors(_, p_u_77) -- name: setEnabledReportErrors
+    -- upvalues: (copy) v_u_3, (copy) v_u_4
+    v_u_3:performTaskOnGAThread(function()
+        -- upvalues: (ref) v_u_4, (copy) p_u_77
+        v_u_4.ReportErrors = p_u_77
+    end)
+end
+function v_u_1.setEnabledCustomUserId(_, p_u_78) -- name: setEnabledCustomUserId
+    -- upvalues: (copy) v_u_3, (copy) v_u_4
+    v_u_3:performTaskOnGAThread(function()
+        -- upvalues: (ref) v_u_4, (copy) p_u_78
+        v_u_4.UseCustomUserId = p_u_78
+    end)
+end
+function v_u_1.setEnabledAutomaticSendBusinessEvents(_, p_u_79) -- name: setEnabledAutomaticSendBusinessEvents
+    -- upvalues: (copy) v_u_3, (copy) v_u_4
+    v_u_3:performTaskOnGAThread(function()
+        -- upvalues: (ref) v_u_4, (copy) p_u_79
+        v_u_4.AutomaticSendBusinessEvents = p_u_79
+    end)
+end
+function v_u_1.addGameAnalyticsTeleportData(_, p80, p81) -- name: addGameAnalyticsTeleportData
+    -- upvalues: (copy) v_u_6
+    local v82 = {}
+    for _, v83 in ipairs(p80) do
+        local v84 = v_u_6:GetPlayerDataFromCache(v83)
+        v84.PlayerTeleporting = true
+        local v85 = {
+            ["SessionID"] = v84.SessionID,
+            ["Sessions"] = v84.Sessions,
+            ["SessionStart"] = v84.SessionStart
+        }
+        v82[tostring(v83)] = v85
+    end
+    p81.gameanalyticsData = v82
+    return p81
+end
+function v_u_1.getRemoteConfigsValueAsString(_, p86, p87) -- name: getRemoteConfigsValueAsString
+    -- upvalues: (copy) v_u_4
+    return v_u_4:getRemoteConfigsStringValue(p86, p87.key or "", p87.defaultValue or nil)
+end
+function v_u_1.isRemoteConfigsReady(_, p88) -- name: isRemoteConfigsReady
+    -- upvalues: (copy) v_u_4
+    return v_u_4:isRemoteConfigsReady(p88)
+end
+function v_u_1.getRemoteConfigsContentAsString(_, p89) -- name: getRemoteConfigsContentAsString
+    -- upvalues: (copy) v_u_4
+    return v_u_4:getRemoteConfigsContentAsString(p89)
+end
+function v_u_1.PlayerJoined(_, p_u_90) -- name: PlayerJoined
+    -- upvalues: (copy) v_u_6, (copy) v_u_15, (copy) v_u_8, (copy) v_u_13, (copy) v_u_7, (copy) v_u_4, (copy) v_u_2, (copy) v_u_1, (ref) v_u_16, (copy) v_u_12, (copy) v_u_10, (copy) v_u_17, (copy) v_u_22
+    local v91 = p_u_90:GetJoinData().TeleportData
+    local v92 = v_u_6:GetPlayerData(p_u_90)
+    local v93
+    if v91 and typeof(v91) == "table" then
+        v93 = v91.gameanalyticsData
+        if v93 then
+            local v94 = v91.gameanalyticsData
+            local v95 = p_u_90.UserId
+            v93 = v94[tostring(v95)]
+        end
+    else
+        v93 = nil
+    end
+    local v96 = v_u_6:GetPlayerDataFromCache(p_u_90.UserId)
+    if v96 then
+        if v93 then
+            v96.SessionID = v93.SessionID
+            v96.SessionStart = v93.SessionStart
+        end
+        v96.PlayerTeleporting = false
+    else
+        local v97, v98 = v_u_15.invokeClient("getPlatform", p_u_90, 5)
+        local v99 = not v97 and "unknown" or v98
+        for v100, v101 in pairs(v_u_6.BasePlayerData) do
+            if not v92[v100] then
+                if typeof(v101) == "table" then
+                    v92[v100] = v_u_8:copyTable(v101)
+                else
+                    v92[v100] = v101
+                end
+            end
+        end
+        local v102, v103 = pcall(function()
+            -- upvalues: (ref) v_u_13, (copy) p_u_90
+            return v_u_13:GetCountryRegionForPlayerAsync(p_u_90)
+        end)
+        if v102 then
+            v92.CountryCode = v103
+        end
+        v_u_6.PlayerCache[p_u_90.UserId] = v92
+        local v104
+        if v99 == "Console" then
+            v104 = "uwp_console"
+        elseif v99 == "Mobile" then
+            v104 = "uwp_mobile"
+        else
+            local _ = v99 == "Desktop"
+            v104 = "uwp_desktop"
+        end
+        v92.Platform = v104
+        v92.OS = v92.Platform .. " 0.0.0"
+        if not v102 then
+            v_u_7:addSdkErrorEvent(p_u_90.UserId, "event_validation", "player_joined", "string_empty_or_null", "country_code", "")
+        end
+        local v105 = ""
+        local v106
+        if v_u_4.UseCustomUserId then
+            local v107
+            v107, v106 = v_u_15.invokeClient("getCustomUserId", p_u_90, 5)
+            if not v107 then
+                v106 = v105
+            end
+        else
+            v106 = v105
+        end
+        if not v_u_8:isStringNullOrEmpty(v106) then
+            v_u_2:i("Using custom id: " .. v106)
+            v92.CustomUserId = v106
+        end
+        v_u_1:startNewSession(p_u_90, v93)
+        v_u_16 = v_u_16 or v_u_12:WaitForChild("OnPlayerReadyEvent")
+        v_u_16:Fire(p_u_90)
+        if v_u_4.AutomaticSendBusinessEvents then
+            if v92.OwnedGamepasses == nil then
+                v92.OwnedGamepasses = {}
+                for _, v108 in ipairs(v_u_4._availableGamepasses) do
+                    if v_u_10:UserOwnsGamePassAsync(p_u_90.UserId, v108) then
+                        local v109 = v92.OwnedGamepasses
+                        table.insert(v109, v108)
+                    end
+                end
+                v_u_6.PlayerCache[p_u_90.UserId] = v92
+                v_u_6:SavePlayerData(p_u_90)
+            else
+                local v110 = {}
+                for _, v111 in ipairs(v_u_4._availableGamepasses) do
+                    if v_u_10:UserOwnsGamePassAsync(p_u_90.UserId, v111) then
+                        table.insert(v110, v111)
+                    end
+                end
+                local v112 = {}
+                for _, v113 in ipairs(v92.OwnedGamepasses) do
+                    v112[v113] = true
+                end
+                for _, v114 in ipairs(v110) do
+                    if not v112[v114] then
+                        local v115 = v92.OwnedGamepasses
+                        table.insert(v115, v114)
+                        local v116 = v_u_17[v114]
+                        if not v116 then
+                            v116 = v_u_10:GetProductInfo(v114, Enum.InfoType.GamePass)
+                            v_u_17[v114] = v116
+                        end
+                        v_u_1:addBusinessEvent(p_u_90.UserId, {
+                            ["amount"] = nil,
+                            ["itemType"] = "Gamepass",
+                            ["itemId"] = nil,
+                            ["cartType"] = "Website",
+                            ["amount"] = v116.PriceInRobux,
+                            ["itemId"] = v_u_1:filterForBusinessEvent(v116.Name)
+                        })
+                    end
+                end
+                v_u_6.PlayerCache[p_u_90.UserId] = v92
+                v_u_6:SavePlayerData(p_u_90)
+            end
+        end
+        local v117 = v_u_22[p_u_90.UserId]
+        if v117 then
+            v_u_22[p_u_90.UserId] = nil
+            for _, v118 in ipairs(v117) do
+                local v119 = v118.Func
+                local v120 = v118.Args
+                v119(unpack(v120))
+            end
+            v_u_2:i("Player initialization queue called #" .. #v117 .. " events")
+        end
+    end
+end
+function v_u_1.PlayerRemoved(_, p121) -- name: PlayerRemoved
+    -- upvalues: (copy) v_u_6, (copy) v_u_1
+    v_u_6:SavePlayerData(p121)
+    local v122 = v_u_6:GetPlayerDataFromCache(p121.UserId)
+    if v122 then
+        if not v122.PlayerTeleporting then
+            v_u_1:endSession(p121.UserId)
+            return
+        end
+        v_u_6.PlayerCache[p121.UserId] = nil
+        v_u_6.DataStoreQueue.RemoveKey(p121.UserId)
+    end
+end
+function v_u_1.isPlayerReady(_, p123) -- name: isPlayerReady
+    -- upvalues: (copy) v_u_6
+    return v_u_6:GetPlayerDataFromCache(p123) and true or false
+end
+function v_u_1.ProcessReceiptCallback(_, p_u_124) -- name: ProcessReceiptCallback
+    -- upvalues: (copy) v_u_17, (copy) v_u_10, (copy) v_u_1
+    local v_u_125 = v_u_17[p_u_124.ProductId]
+    if not v_u_125 then
+        pcall(function()
+            -- upvalues: (ref) v_u_125, (ref) v_u_10, (copy) p_u_124, (ref) v_u_17
+            v_u_125 = v_u_10:GetProductInfo(p_u_124.ProductId, Enum.InfoType.Product)
+            v_u_17[p_u_124.ProductId] = v_u_125
+        end)
+    end
+    if v_u_125 then
+        v_u_1:addBusinessEvent(p_u_124.PlayerId, {
+            ["amount"] = nil,
+            ["itemType"] = "DeveloperProduct",
+            ["itemId"] = nil,
+            ["amount"] = p_u_124.CurrencySpent,
+            ["itemId"] = v_u_1:filterForBusinessEvent(v_u_125.Name)
+        })
+    end
+end
+function v_u_1.GamepassPurchased(_, p126, p127, p128) -- name: GamepassPurchased
+    -- upvalues: (copy) v_u_17, (copy) v_u_10, (copy) v_u_1
+    local v129 = v_u_17[p127]
+    if not v129 then
+        v129 = v_u_10:GetProductInfo(p127, Enum.InfoType.GamePass)
+        v_u_17[p127] = v129
+    end
+    local v130 = 0
+    local v131 = "GamePass"
+    if p128 then
+        v130 = p128.PriceInRobux
+        v131 = p128.Name
+    elseif v129 then
+        v130 = v129.PriceInRobux
+        v131 = v129.Name
+    end
+    v_u_1:addBusinessEvent(p126.UserId, {
+        ["amount"] = nil,
+        ["itemType"] = "Gamepass",
+        ["itemId"] = nil,
+        ["gamepassId"] = nil,
+        ["amount"] = v130 or 0,
+        ["itemId"] = v_u_1:filterForBusinessEvent(v131),
+        ["gamepassId"] = p127
+    })
+end
+local v_u_132 = { "gameKey", "secretKey" }
+function v_u_1.initServer(_, p133, p134) -- name: initServer
+    -- upvalues: (copy) v_u_1
+    v_u_1:initialize({
+        ["gameKey"] = p133,
+        ["secretKey"] = p134
+    })
+end
+function v_u_1.initialize(_, p_u_135) -- name: initialize
+    -- upvalues: (copy) v_u_3, (copy) v_u_132, (copy) v_u_2, (copy) v_u_1, (copy) v_u_35, (copy) v_u_5, (copy) v_u_7, (copy) v_u_4, (copy) v_u_9, (ref) v_u_21
+    v_u_3:performTaskOnGAThread(function()
+        -- upvalues: (ref) v_u_132, (copy) p_u_135, (ref) v_u_2, (ref) v_u_1, (ref) v_u_35, (ref) v_u_5, (ref) v_u_7, (ref) v_u_4, (ref) v_u_9, (ref) v_u_21
+        for _, v136 in ipairs(v_u_132) do
+            if p_u_135[v136] == nil then
+                v_u_2:e("Initialize \'" .. v136 .. "\' option missing")
+                return
+            end
+        end
+        if p_u_135.enableInfoLog ~= nil and p_u_135.enableInfoLog then
+            v_u_1:setEnabledInfoLog(p_u_135.enableInfoLog)
+        end
+        if p_u_135.enableVerboseLog ~= nil and p_u_135.enableVerboseLog then
+            v_u_1:setEnabledVerboseLog(p_u_135.enableVerboseLog)
+        end
+        if p_u_135.availableCustomDimensions01 ~= nil and #p_u_135.availableCustomDimensions01 > 0 then
+            v_u_1:configureAvailableCustomDimensions01(p_u_135.availableCustomDimensions01)
+        end
+        if p_u_135.availableCustomDimensions02 ~= nil and #p_u_135.availableCustomDimensions02 > 0 then
+            v_u_1:configureAvailableCustomDimensions02(p_u_135.availableCustomDimensions02)
+        end
+        if p_u_135.availableCustomDimensions03 ~= nil and #p_u_135.availableCustomDimensions03 > 0 then
+            v_u_1:configureAvailableCustomDimensions03(p_u_135.availableCustomDimensions03)
+        end
+        if p_u_135.availableResourceCurrencies ~= nil and #p_u_135.availableResourceCurrencies > 0 then
+            v_u_1:configureAvailableResourceCurrencies(p_u_135.availableResourceCurrencies)
+        end
+        if p_u_135.availableResourceItemTypes ~= nil and #p_u_135.availableResourceItemTypes > 0 then
+            v_u_1:configureAvailableResourceItemTypes(p_u_135.availableResourceItemTypes)
+        end
+        if p_u_135.build ~= nil and #p_u_135.build > 0 then
+            v_u_1:configureBuild(p_u_135.build)
+        end
+        if p_u_135.availableGamepasses ~= nil and #p_u_135.availableGamepasses > 0 then
+            v_u_1:configureAvailableGamepasses(p_u_135.availableGamepasses)
+        end
+        if p_u_135.enableDebugLog ~= nil then
+            v_u_1:setEnabledDebugLog(p_u_135.enableDebugLog)
+        end
+        if p_u_135.automaticSendBusinessEvents ~= nil then
+            v_u_1:setEnabledAutomaticSendBusinessEvents(p_u_135.automaticSendBusinessEvents)
+        end
+        if p_u_135.reportErrors ~= nil then
+            v_u_1:setEnabledReportErrors(p_u_135.reportErrors)
+        end
+        if p_u_135.useCustomUserId ~= nil then
+            v_u_1:setEnabledCustomUserId(p_u_135.useCustomUserId)
+        end
+        if v_u_35({
+            ["needsInitialized"] = true,
+            ["shouldWarn"] = false
+        }) then
+            v_u_2:w("SDK already initialized. Can only be called once.")
+            return
+        else
+            local v137 = p_u_135.gameKey
+            local v138 = p_u_135.secretKey
+            if v_u_5:validateKeys(v137, v138) then
+                v_u_7.GameKey = v137
+                v_u_7.SecretKey = v138
+                v_u_4.Initialized = true
+                v_u_9.PlayerAdded:Connect(function(p139)
+                    -- upvalues: (ref) v_u_1
+                    v_u_1:PlayerJoined(p139)
+                end)
+                v_u_9.PlayerRemoving:Connect(function(p140)
+                    -- upvalues: (ref) v_u_1
+                    v_u_1:PlayerRemoved(p140)
+                end)
+                for _, v141 in ipairs(v_u_9:GetPlayers()) do
+                    coroutine.wrap(v_u_1.PlayerJoined)(v_u_1, v141)
+                end
+                for _, v142 in ipairs(v_u_21) do
+                    local v143 = task.spawn
+                    local v144 = v142.Func
+                    local v145 = v142.Args
+                    v143(v144, unpack(v145))
+                end
+                v_u_2:i("Server initialization queue called #" .. #v_u_21 .. " events")
+                v_u_21 = {}
+                v_u_7:processEventQueue()
+            else
+                v_u_2:w("SDK failed initialize. Game key or secret key is invalid. Can only contain characters A-z 0-9, gameKey is 32 length, secretKey is 40 length. Failed keys - gameKey: " .. v137 .. ", secretKey: " .. v138)
+            end
+        end
+    end)
+end
+if not v_u_12:FindFirstChild("GameAnalyticsRemoteConfigs") then
+    local v146 = Instance.new("RemoteEvent")
+    v146.Name = "GameAnalyticsRemoteConfigs"
+    v146.Parent = v_u_12
+end
+if not v_u_12:FindFirstChild("OnPlayerReadyEvent") then
+    local v147 = Instance.new("BindableEvent")
+    v147.Name = "OnPlayerReadyEvent"
+    v147.Parent = v_u_12
+end
+task.spawn(function()
+    -- upvalues: (ref) v_u_18, (copy) v_u_6, (ref) v_u_19, (ref) v_u_20
+    local v148 = os.time() / 3600
+    v_u_18 = v_u_6:GetErrorDataStore((math.floor(v148)))
+    while task.wait(3600) do
+        local v149 = os.time() / 3600
+        v_u_18 = v_u_6:GetErrorDataStore((math.floor(v149)))
+        v_u_19 = {}
+        v_u_20 = {}
+    end
+end)
+task.spawn(function()
+    -- upvalues: (copy) v_u_6, (ref) v_u_20, (ref) v_u_19, (ref) v_u_18
+    while task.wait(v_u_6.AutoSaveData) do
+        for _, v150 in pairs(v_u_20) do
+            local v151 = v_u_19[v150]
+            local v152 = v151.currentCount - v151.countInDS
+            v_u_19[v150].countInDS = v_u_6:IncrementErrorCount(v_u_18, v150, v152)
+            v_u_19[v150].currentCount = v_u_19[v150].countInDS
+        end
+    end
+end)
+local function v_u_160(p153, p154, p155, p156) -- name: ErrorHandler
+    -- upvalues: (ref) v_u_19, (ref) v_u_20, (copy) v_u_1
+    local v157 = (p155 == nil and "(null)" or p155) .. ": message=" .. (p153 == nil and "(null)" or p153) .. ", trace=" .. (p154 == nil and "(null)" or p154)
+    if #v157 > 8192 then
+        v157 = string.sub(v157, 1, 8192)
+    end
+    local v158
+    if p156 then
+        v158 = p156.UserId
+        v157 = v157:gsub(p156.Name, "[LocalPlayer]")
+    else
+        v158 = nil
+    end
+    local v159
+    if #v157 > 50 then
+        v159 = string.sub(v157, 1, 50)
+    else
+        v159 = v157
+    end
+    if v_u_19[v159] == nil then
+        v_u_20[#v_u_20 + 1] = v159
+        v_u_19[v159] = {}
+        v_u_19[v159].countInDS = 0
+        v_u_19[v159].currentCount = 0
+    end
+    if v_u_19[v159].currentCount <= 10 then
+        v_u_1:addErrorEvent(v158, {
+            ["severity"] = v_u_1.EGAErrorSeverity.error,
+            ["message"] = v157
+        })
+        v_u_19[v159].currentCount = v_u_19[v159].currentCount + 1
+    end
+end
+v14.Error:Connect(function(p161, p162, p_u_163) -- name: ErrorHandlerFromServer
+    -- upvalues: (copy) v_u_4, (copy) v_u_160
+    if v_u_4.ReportErrors then
+        if p_u_163 then
+            local v_u_164 = nil
+            local v165, _ = pcall(function()
+                -- upvalues: (ref) v_u_164, (copy) p_u_163
+                v_u_164 = p_u_163:GetFullName()
+            end)
+            if v165 then
+                return v_u_160(p161, p162, v_u_164)
+            end
+        end
+    else
+        return
+    end
+end)
+if not v_u_12:FindFirstChild("GameAnalyticsError") then
+    local v166 = Instance.new("RemoteEvent")
+    v166.Name = "GameAnalyticsError"
+    v166.Parent = v_u_12
+end
+v_u_12.GameAnalyticsError.OnServerEvent:Connect(function(p167, p168, p169, p170)
+    -- upvalues: (copy) v_u_4, (copy) v_u_160
+    if v_u_4.ReportErrors then
+        v_u_160(p168, p169, p170, p167)
+    end
+end)
+v_u_10.PromptGamePassPurchaseFinished:Connect(function(p171, p172, p173)
+    -- upvalues: (copy) v_u_4, (copy) v_u_1
+    if v_u_4.AutomaticSendBusinessEvents and p173 then
+        v_u_1:GamepassPurchased(p171, p172)
+    end
+end)
+return v_u_1
+-- Script Path: game:GetService("ReplicatedStorage").GameAnalytics.GameAnalyticsClient
+-- Took 0s to decompile.
+-- Executor: Delta (1.1.736.1408)
+
+local v1 = {}
+local v_u_2 = game:GetService("GuiService")
+local v_u_3 = game:GetService("UserInputService")
+local v_u_4 = game:GetService("ReplicatedStorage")
+local v_u_5 = game:GetService("ScriptContext")
+function v1.initClient() -- name: initClient
+    -- upvalues: (copy) v_u_5, (copy) v_u_4, (copy) v_u_2, (copy) v_u_3
+    local v6 = require(script.Parent.GameAnalytics.Postie)
+    v_u_5.Error:Connect(function(p7, p8, p_u_9)
+        -- upvalues: (ref) v_u_4
+        if p_u_9 then
+            local v_u_10 = nil
+            local v11, _ = pcall(function()
+                -- upvalues: (ref) v_u_10, (copy) p_u_9
+                v_u_10 = p_u_9:GetFullName()
+            end)
+            if v11 then
+                v_u_4.GameAnalyticsError:FireServer(p7, p8, v_u_10)
+            end
+        else
+            return
+        end
+    end)
+    local function v12() -- name: getPlatform
+        -- upvalues: (ref) v_u_2, (ref) v_u_3
+        return v_u_2:IsTenFootInterface() and "Console" or (v_u_3.TouchEnabled and not v_u_3.MouseEnabled and "Mobile" or "Desktop")
+    end
+    v6.setCallback("getPlatform", v12)
+end
+return v1
+game:GetService("Players").LocalPlayer.JumpPower-- This code was generated by Cobalt
+-- https://gitlab.com/upio/cobalt
+
+local Event = game:GetService("ReplicatedStorage").Remotes.PlaceEggRequest
+Event:FireServer(
+    "30f50f49-e0ca-4c2b-ba10-91a75961f9f7",
+    Vector3.new(-9.5002040863037, -2, 54.227313995361)
+)-- This code was generated by Cobalt
+-- https://gitlab.com/upio/cobalt
+
+local Event = game:GetService("ReplicatedStorage").Remotes.StopSquattingRequest
+Event:FireServer()-- This code was generated by Cobalt
+-- https://gitlab.com/upio/cobalt
+
+local Event = game:GetService("ReplicatedStorage").Remotes.SquatTrainingRequest
+Event:FireServer(
+    workspace.Map.Plots.Plot_1.SquatZone.Floor.Detector
+)
