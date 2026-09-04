@@ -1,0 +1,4 @@
+sebisa mungkin menjauh dari  workspace.Map.ClientGuards
+ini cara collect
+workspace.Map.Stages.Meadow.SpawnedEggs.Chicken.EggRoot.EggPromptAttachment.CollectPrompt
+workspace.Map.Stages.Meadow.Spawners
